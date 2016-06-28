@@ -20,16 +20,27 @@ startdocker() {
 }
 
 dockerssh() {
-	startdocker
-	ID=$(docker ps -f 'name=apache*' -q)
+        startdocker
+        ID=$(docker ps -f 'name=apache' -q)
 
         if [ "$ID" != "" ]
         then
-		docker exec -it $ID env TERM=xterm bash
-	fi
+                docker exec -it $ID env TERM=xterm bash
+        fi
+}
+
+dockerlogs() {
+        startdocker
+        ID=$(docker ps -f 'name=apache' -q)
+
+        if [ "$ID" != "" ]
+        then
+                docker logs -f $ID
+        fi
 }
 
 alias fuphp=finditphp
 alias ll='ls -al'
 alias bt=startdocker
 alias dosh=dockerssh
+alias dolg=dockerlogs

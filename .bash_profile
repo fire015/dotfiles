@@ -8,30 +8,17 @@ finditphp() {
         find . -name "*.php" | xargs fgrep -l -i -e "$1"
 }
 
-startdocker() {
-	STATUS=$(docker-machine status default)
-
-	if [ "$STATUS" != "Running" ]
-	then
-		docker-machine start default
-	fi
-
-	eval $(docker-machine env default)
-}
-
 dockerssh() {
-        startdocker
-        ID=$(docker ps -f 'name=apache' -q)
+    ID=$(docker ps -f 'name=app' -q)
 
         if [ "$ID" != "" ]
         then
-                docker exec -it $ID env TERM=xterm bash
-        fi
+        docker exec -it $ID env TERM=xterm LINES=600 COLUMNS=100 bash
+    fi
 }
 
 dockerlogs() {
-        startdocker
-        ID=$(docker ps -f 'name=apache' -q)
+        ID=$(docker ps -f 'name=app' -q)
 
         if [ "$ID" != "" ]
         then
@@ -39,8 +26,14 @@ dockerlogs() {
         fi
 }
 
+kubeproxy() {
+	export KUBECONFIG=$HOME/.ssh/kops-nonprod-kubeconfig
+	echo "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
+	kubectl proxy
+}
+
 alias fuphp=finditphp
 alias ll='ls -al'
-alias bt=startdocker
 alias dosh=dockerssh
 alias dolg=dockerlogs
+alias kubeproxy=kubeproxy

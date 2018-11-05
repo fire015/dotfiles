@@ -27,7 +27,15 @@ dockerlogs() {
 }
 
 kubeproxy() {
-	export KUBECONFIG=$HOME/.ssh/kops-nonprod-kubeconfig
+	while true; do
+		read -p "Production (y) or Non-Production (n)? " yn
+		case $yn in
+			[Yy]* ) export KUBECONFIG=$HOME/.ssh/kops-prod-kubeconfig; break;;
+			[Nn]* ) export KUBECONFIG=$HOME/.ssh/kops-nonprod-kubeconfig; break;;
+			* ) echo "Please answer yes or no.";;
+		esac
+	done	
+
 	echo "http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/"
 	kubectl proxy
 }
@@ -37,3 +45,5 @@ alias ll='ls -al'
 alias dosh=dockerssh
 alias dolg=dockerlogs
 alias kubeproxy=kubeproxy
+alias kubeprod='export KUBECONFIG=$HOME/.ssh/kops-prod-kubeconfig'
+alias kubenonprod='export KUBECONFIG=$HOME/.ssh/kops-nonprod-kubeconfig'
